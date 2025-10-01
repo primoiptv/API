@@ -1,0 +1,60 @@
+openapi: 3.0.1
+info:
+  title: Primo Lead Saver
+  version: "1.0.0"
+servers:
+  - url: https://script.google.com/macros/s/AKfycbzUXT42iKfBMGLvcpTIBpTt8JYp4f1EObWPOvxr-A4KpYTLOmBmSJa1AaXqm0WU32I
+paths:
+  /exec:
+    post:
+      operationId: saveLead
+      summary: Save a lead into Google Sheets
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [action, name]
+              properties:
+                action:
+                  type: string
+                  example: saveLead
+                id:
+                  type: string
+                  description: Use chat_id when available; otherwise backend generates one.
+                name:
+                  type: string
+                email:
+                  type: string
+                whatsapp:
+                  type: string
+                  description: WhatsApp number (international format)
+                phone:
+                  type: string
+                  description: Fallback for whatsapp
+                plan:
+                  type: string
+                  description: e.g., Trial, 1m Essential, 6m VIP, 12m VIP
+                date:
+                  type: string
+                  description: ISO date; if omitted, backend uses today
+                done:
+                  type: boolean
+                  description: Marks the DONE ? checkbox
+                notes:
+                  type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  saved:
+                    type: boolean
+                  id:
+                    type: string

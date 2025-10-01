@@ -1,60 +1,62 @@
-openapi: 3.0.1
+openapi: "3.0.0"
 info:
-  title: Primo Lead Saver
-  version: "1.0.0"
+  version: 1.0.0
+  title: Google Sheet Query API
+  description: >
+    This API retrieves product descriptions based on code
+  license:
+    name: MIT
 servers:
   - url: https://script.google.com/macros/s/AKfycbwxmnV4wTImq6MPIrGGUEvH11U37MLApZuitpZpdhZ9LdQPlorsVc5A0zb5fl0NG7aT
 paths:
   /exec:
     post:
-      operationId: saveLead
-      summary: Save a lead into Google Sheets
-      requestBody:
+      summary: Retrieve product details based on product code
+      operationId: findProductsByCode
+      parameters:
+      - in: query
+        name: query
+        schema:
+          type: string
+          minLength : 3
         required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [action, name]
-              properties:
-                action:
-                  type: string
-                  example: saveLead
-                id:
-                  type: string
-                  description: Use chat_id when available; otherwise backend generates one.
-                name:
-                  type: string
-                email:
-                  type: string
-                whatsapp:
-                  type: string
-                  description: WhatsApp number (international format)
-                phone:
-                  type: string
-                  description: Fallback for whatsapp
-                plan:
-                  type: string
-                  description: e.g., Trial, 1m Essential, 6m VIP, 12m VIP
-                date:
-                  type: string
-                  description: ISO date; if omitted, backend uses today
-                done:
-                  type: boolean
-                  description: Marks the DONE ? checkbox
-                notes:
-                  type: string
+        description: Code to look up products. Performs a partial match. Minimum of 3 characters
       responses:
-        "200":
-          description: OK
+        '200':
+          description: Found products
+          content:
+            application/json:
+              schema:
+                type: object
+                properties :
+                  total:
+                    type: number
+                    description : Total number of that match the provided code
+                  entries:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          example: "A123"
+                        name:
+                          type: string
+                          example: "Example Name"
+                        description:
+                          type: string
+                          example : "Product A123 is very awesome"
+        '400':
+          description: Missing parameters
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  ok:
-                    type: boolean
-                  saved:
-                    type: boolean
-                  id:
+                  status:
                     type: string
+                  message:
+                    type: string
+                example:
+                  status: error
+                  message: Missing parameters

@@ -3,7 +3,7 @@ info:
   title: Primo Lead Saver
   version: "1.0.0"
 servers:
-  - url: https://script.google.com/macros/s/AKfycbzUXT42iKfBMGLvcpTIBpTt8JYp4f1EObWPOvxr-A4KpYTLOmBmSJa1AaXqm0WU32I
+  - url: https://script.google.com/macros/s/AKfycbwxmnV4wTImq6MPIrGGUEvH11U37MLApZuitpZpdhZ9LdQPlorsVc5A0zb5fl0NG7aT
 paths:
   /exec:
     post:

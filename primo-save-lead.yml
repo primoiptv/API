@@ -1,62 +1,69 @@
-openapi: "3.0.0"
+openapi: 3.0.1
 info:
-  version: 1.0.0
-  title: Google Sheet Query API
-  description: >
-    This API retrieves product descriptions based on code
-  license:
-    name: MIT
+  title: Primo Lead Saver
+  version: "1.0.0"
 servers:
   - url: https://script.google.com/macros/s/AKfycbwxmnV4wTImq6MPIrGGUEvH11U37MLApZuitpZpdhZ9LdQPlorsVc5A0zb5fl0NG7aT
 paths:
   /exec:
     post:
-      summary: Retrieve product details based on product code
-      operationId: findProductsByCode
-      parameters:
-      - in: query
-        name: query
-        schema:
-          type: string
-          minLength : 3
+      operationId: saveLead
+      summary: Save a lead into Google Sheets (PRIMO LLC / TRIALS)
+      description: |
+        Appends one row to the "TRIALS" tab with columns:
+        [ID, NAME, EMAIL, WHATSAPP, PLAN, DATE, DONE ?, NOTES].
+        Send JSON with action=saveLead.
+      requestBody:
         required: true
-        description: Code to look up products. Performs a partial match. Minimum of 3 characters
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [action, name]
+              properties:
+                action:
+                  type: string
+                  enum: [saveLead]
+                  example: saveLead
+                id:
+                  type: string
+                  description: Optional. Use chat_id or any unique id; backend generates one if omitted.
+                name:
+                  type: string
+                  description: Full name
+                email:
+                  type: string
+                  format: email
+                whatsapp:
+                  type: string
+                  description: E.164 or any text
+                phone:
+                  type: string
+                  description: Fallback for whatsapp; backend maps phone→whatsapp if provided
+                plan:
+                  type: string
+                  description: e.g., Trial, 1m Essential, 6m VIP, 12m VIP
+                date:
+                  type: string
+                  description: ISO date; defaults to today if omitted
+                done:
+                  type: boolean
+                  description: Sets the DONE ? checkbox (default false)
+                notes:
+                  type: string
       responses:
-        '200':
-          description: Found products
-          content:
-            application/json:
-              schema:
-                type: object
-                properties :
-                  total:
-                    type: number
-                    description : Total number of that match the provided code
-                  entries:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        code:
-                          type: string
-                          example: "A123"
-                        name:
-                          type: string
-                          example: "Example Name"
-                        description:
-                          type: string
-                          example : "Product A123 is very awesome"
-        '400':
-          description: Missing parameters
+        "200":
+          description: OK
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  status:
+                  ok:
+                    type: boolean
+                  saved:
+                    type: boolean
+                  row:
+                    type: integer
+                  id:
                     type: string
-                  message:
-                    type: string
-                example:
-                  status: error
-                  message: Missing parameters

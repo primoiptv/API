@@ -1,182 +1,66 @@
 openapi: "3.0.0"
 info:
-  version: "1.0.0"
-  title: Google Form/Sheet Submit API
+  version: 1.0.0
+  title: Google Sheets Submit API
   description: >
-    Submit customer info to a Google Apps Script Web App that writes into a Google Form/Sheet.
-    JSON keys must match the Google Form question titles (or the Sheet column headers) exactly.
+    This API submits customer lead information to a Google Sheet.
   license:
     name: MIT
-
 servers:
-  - url: https://script.google.com/macros/s/AKfycbxNo5AADMjrcBtq50zSZ6ME9k9LLL5iyqKozDbAHzpdw8S--Az8SqFdpdc4emnZzMtS/exec
-    description: Production Web App (/exec)
-
+  - url: https://script.google.com/macros/s/AKfycbxNo5AADMjrcBtq50zSZ6ME9k9LLL5iyqKozDbAHzpdw8S--Az8SqFdpdc4emnZzMtS
 paths:
-  /:
+  /exec:
     post:
-      summary: Submit customer data
-      operationId: submitForm
-      description: |
-        Sends a JSON body where keys map 1:1 to your Google Form titles (or Sheet headers).
-        If a shared secret is configured in the Apps Script, include it in header `X-Webhook-Secret`.
-      parameters:
-        - in: header
-          name: X-Webhook-Secret
-          required: false
-          schema:
-            type: string
-          description: Optional shared secret if enforced by the Web App.
+      summary: Submit customer information to Google Sheets
+      operationId: submitLead
       requestBody:
+        description: Fields to be submitted to the Sheet
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/FormSubmission"
-            examples:
-              minimal:
-                summary: Minimal example (required fields only)
-                value:
-                  Full Name: "John Doe"
-                  Email: "john.doe@example.com"
-              full:
-                summary: Full example
-                value:
-                  Full Name: "John Doe"
-                  Email: "john.doe@example.com"
-                  Gender: "Male"
-                  Type of Customer: "New"
-                  Address: "221B Baker Street, London"
-                  Email Preferences:
-                    - "Deals and Promotions"
-                    - "Announcements"
-                  Birthday: "1995-06-21"
-                  Preferred Delivery Time: "2025-10-05T14:30:00Z"
+              type: object
+              required:
+                - NAME
+                - EMAIL
+                - WHATSAPP
+              properties:
+                NAME:
+                  type: string
+                  description: Full name of the customer
+                  example: "John Doe"
+                EMAIL:
+                  type: string
+                  description: Customer’s email address
+                  format: email
+                  example: "john@example.com"
+                WHATSAPP:
+                  type: string
+                  description: Customer’s WhatsApp number (include country code)
+                  example: "+212612345678"
       responses:
-        "200":
-          description: Submission outcome
+        '200':
+          description: Lead submitted successfully
           content:
             application/json:
               schema:
-                oneOf:
-                  - $ref: "#/components/schemas/SubmitSuccess"
-                  - $ref: "#/components/schemas/SubmitFailure"
-              examples:
-                success:
-                  summary: Success
-                  value:
-                    submitted: true
-                    timestamp: "2025-10-03T01:23:45.000Z"
-                    id: "abc123"
-                failure:
-                  summary: Failure (validation or internal)
-                  value:
-                    submitted: false
-                    error: "Invalid value/type for \"Email Preferences\""
-        "400":
-          description: Bad request (e.g., invalid JSON)
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SubmitFailure"
-              example:
-                submitted: false
-                error: "Invalid JSON: SyntaxError: Unexpected token } in JSON at position 42"
-        "401":
-          description: Unauthorized (shared secret missing/incorrect)
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SubmitFailure"
-              example:
-                submitted: false
-                error: "Unauthorized"
-        "500":
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SubmitFailure"
-              example:
-                submitted: false
-                error: "Error: Sheet/tab named \"TRIALS\" not found."
-
-components:
-  schemas:
-    FormSubmission:
-      type: object
-      required:
-        - Full Name
-        - Email
-      properties:
-        Full Name:
-          type: string
-          description: Customer's full name.
-          example: "Jane Smith"
-        Email:
-          type: string
-          format: email
-          description: Customer's email address.
-          example: "jane@example.com"
-        Gender:
-          type: string
-          description: Customer's gender.
-          enum: [Male, Female]
-          example: "Female"
-        Type of Customer:
-          type: string
-          description: Whether the customer is new or existing.
-          enum: [New, Existing]
-          example: "New"
-        Address:
-          type: string
-          description: Customer's street address (free text).
-          example: "1600 Amphitheatre Pkwy, Mountain View, CA"
-        Email Preferences:
-          type: array
-          description: Email subscription options. For checkbox-style questions.
-          items:
-            type: string
-            enum:
-              - Deals and Promotions
-              - Announcements
-          example:
-            - Deals and Promotions
-        Birthday:
-          type: string
-          format: date
-          description: Customer's birthday (YYYY-MM-DD).
-          example: "1990-12-05"
-        Preferred Delivery Time:
-          type: string
-          format: date-time
-          description: Desired delivery datetime in ISO-8601 format.
-          example: "2025-10-05T14:30:00Z"
-
-    SubmitSuccess:
-      type: object
-      properties:
-        submitted:
-          type: boolean
-          const: true
-          description: Indicates successful submission.
-        timestamp:
-          type: string
-          format: date-time
-          description: Submission timestamp recorded by the Web App.
-        id:
-          type: string
-          description: Response ID (if available from Form API).
-      required: [submitted, timestamp]
-
-    SubmitFailure:
-      type: object
-      properties:
-        submitted:
-          type: boolean
-          const: false
-          description: Indicates the submission failed.
-        error:
-          type: string
-          description: Error details.
-      required: [submitted, error]
+                type: object
+                properties:
+                  submitted:
+                    type: boolean
+                    description: Submission status
+                    example: true
+                  timestamp:
+                    type: string
+                    format: date-time
+                    description: Time the form was submitted
+                    example: "2025-10-04T12:45:30Z"
+                  id:
+                    type: string
+                    description: Unique ID of the submitted row
+                    example: "row-27"
+                  error:
+                    type: string
+                    nullable: true
+                    description: Error message if submission fails
+                    example: null

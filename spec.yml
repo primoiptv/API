@@ -1,62 +1,84 @@
 openapi: "3.0.0"
 info:
   version: 1.0.0
-  title: Google Sheet Query API
+  title: Google Form Submit API
   description: >
-    This API retrieves product descriptions based on code
+    This API submits a Google Form with customer information
   license:
     name: MIT
 servers:
-  - url: https://script.google.com/macros/s/AKfycbxScwUOque8lmgM5-uPGfV_IC53oKITfRrTFuiVrtdFl45NCtikP7lXTX2nT5_FVU1q
+  - url: https://script.google.com/macros/s/AKfyc...jt1_Iw
 paths:
   /exec:
     post:
-      summary: Retrieve product details based on product code
-      operationId: findProductsByCode
-      parameters:
-      - in: query
-        name: query
-        schema:
-          type: string
-          minLength : 3
+      summary: Submit a Google Form collecting customer's information
+      operationId: submitForm
+      requestBody:
+        description: Fields to be submitted with the form
         required: true
-        description: Code to look up products. Performs a partial match. Minimum of 3 characters
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - 'Full Name'
+                - 'Email'
+              properties:
+                'Full Name':
+                  type: string
+                  description: Customer's full name
+                'Email':
+                  type: string
+                  description: Customer's email
+                'Gender':
+                  type: string
+                  description: Customer's gender
+                  enum:
+                    - 'Male'
+                    - 'Female'
+                'Type of Customer':
+                  type: string
+                  description: New or existing customer
+                  enum:
+                    - 'New'
+                    - 'Existing'
+                'Address':
+                  type: string
+                  description: Customer's address
+                'Email Preferences':
+                  type: array
+                  items:
+                    type: string
+                    enum:
+                      - 'Deals and Promotions'
+                      - 'Announcements'
+                  description: Customer's email preferences
+                'Birthday':
+                  type: string
+                  format: date
+                  description: Customer's birthday
+                'Preferred Delivery Time':
+                  type: string
+                  format: date-time
+                  description: Customer's preferred delivery time
       responses:
         '200':
-          description: Found products
+          description: Form submitted successfully
           content:
             application/json:
               schema:
                 type: object
                 properties :
-                  total:
-                    type: number
-                    description : Total number of that match the provided code
-                  entries:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        code:
-                          type: string
-                          example: "A123"
-                        name:
-                          type: string
-                          example: "Example Name"
-                        description:
-                          type: string
-                          example : "Product A123 is very awesome"
-        '400':
-          description: Missing parameters
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
+                  submitted:
+                    type: boolean
+                    description: Form submitted status
+                  timestamp:
                     type: string
-                  message:
+                    format: date-time
+                    description: Form submitted time
+                  id:
                     type: string
-                example:
-                  status: error
-                  message: Missing parameters
+                    description: ID of the submitted response
+                  error:
+                    type: string
+                    description: Form submission error

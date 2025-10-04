@@ -2,83 +2,43 @@ openapi: "3.0.0"
 info:
   version: 1.0.0
   title: Google Form Submit API
-  description: >
-    This API submits a Google Form with customer information
-  license:
-    name: MIT
+  description: Collects visitor info and sends it to your Google Form
 servers:
-  - url: https://script.google.com/macros/s/AKfycbxcpokFULvGdO-_yInOZ-sUjJ_2aj6M4kFqv3ErbE4WjzARU-tpEPh-XROsey8DYCBD
+  - url: "https://script.google.com/macros/s/AKfycbyQ9RAmyPKPNRF2j6BLz91bYU8K59bqtb1_7AY2Jx0JWFmlRCa-RFOdjRMfldy9vu0n"
 paths:
   /exec:
     post:
-      summary: Submit a Google Form collecting customer's information
-      operationId: submitForm
+      summary: Submit lead info to Google Form
+      operationId: submitLead
       requestBody:
-        description: Fields to be submitted with the form
         required: true
         content:
           application/json:
             schema:
               type: object
               required:
-                - 'Full Name'
-                - 'Email'
+                - Full Name
+                - Email
+                - WhatsApp Number
               properties:
-                'Full Name':
+                Full Name:
                   type: string
-                  description: Customer's full name
-                'Email':
+                  description: Visitor's full name
+                Email:
                   type: string
-                  description: Customer's email
-                'Gender':
+                  description: Visitor's email address
+                WhatsApp Number:
                   type: string
-                  description: Customer's gender
-                  enum:
-                    - 'Male'
-                    - 'Female'
-                'Type of Customer':
-                  type: string
-                  description: New or existing customer
-                  enum:
-                    - 'New'
-                    - 'Existing'
-                'Address':
-                  type: string
-                  description: Customer's address
-                'Email Preferences':
-                  type: array
-                  items:
-                    type: string
-                    enum:
-                      - 'Deals and Promotions'
-                      - 'Announcements'
-                  description: Customer's email preferences
-                'Birthday':
-                  type: string
-                  format: date
-                  description: Customer's birthday
-                'Preferred Delivery Time':
-                  type: string
-                  format: date-time
-                  description: Customer's preferred delivery time
+                  description: Visitor's WhatsApp phone number
       responses:
-        '200':
-          description: Form submitted successfully
+        "200":
+          description: Successful submission
           content:
             application/json:
               schema:
                 type: object
-                properties :
+                properties:
                   submitted:
                     type: boolean
-                    description: Form submitted status
                   timestamp:
                     type: string
-                    format: date-time
-                    description: Form submitted time
-                  id:
-                    type: string
-                    description: ID of the submitted response
-                  error:
-                    type: string
-                    description: Form submission error

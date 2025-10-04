@@ -2,9 +2,9 @@ openapi: "3.0.0"
 info:
   version: 1.0.0
   title: Google Form Submit API
-  description: Collects visitor info and sends it to your Google Form
+  description: Collects visitor info and sends to your Google Form
 servers:
-  - url: "https://script.google.com/macros/s/AKfycbyQ9RAmyPKPNRF2j6BLz91bYU8K59bqtb1_7AY2Jx0JWFmlRCa-RFOdjRMfldy9vu0n"
+  - url: "https://script.google.com/macros/s/AKfycbzWcGuJkgs3Q1EgUC2BLpadm_sJ22lnrh07Q-htA0NJQ0E9Z739fUC8YKismnkflU0m"
 paths:
   /exec:
     post:
@@ -20,16 +20,17 @@ paths:
                 - Full Name
                 - Email
                 - WhatsApp Number
+                - Package
               properties:
                 Full Name:
                   type: string
-                  description: Visitor's full name
                 Email:
                   type: string
-                  description: Visitor's email address
                 WhatsApp Number:
                   type: string
-                  description: Visitor's WhatsApp phone number
+                Package:
+                  type: string
+                  enum: ["Essential", "ELITE VIP"]
       responses:
         "200":
           description: Successful submission
